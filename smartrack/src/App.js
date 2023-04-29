@@ -1,29 +1,11 @@
 import './App.css';
-import React, { useState, useEffect, createRef } from 'react';
+import React, { useState, useEffect} from 'react';
 
 
 function App() {
-  const file = createRef();
   const onSubmit = async (e) => {
     e.preventDefault();
-    const formD = new FormData();
-    formD.set("video", file.current.value);
-    try {
-      const res = await fetch('/profile', {       // istead of /profile it has to match the url in FLASK to recieve the video
-        method: "POST",
-        body: formD
-      });
-
-      const parseRes = await res.json();
-      if (parseRes.ok){
-        alert("File has been uploaded");
-      } else {
-        console.error("Error in file upload");
-      }
-
-    } catch (e){
-      console.error("An error has occured");
-    }
+  
   }
 
   const [data, setData] = useState([{}]) // used to fetch data from backend and manipulate it
@@ -41,8 +23,8 @@ function App() {
 
   return (
     <div className="App">
-      <form onSubmit={onSubmit}>
-        <input type="file" name="video" ref={file} />
+      <form method='POST' enctype='multipart/form-data' onSubmit={onSubmit}>
+        <input type="file" name="video" accept="video/mp4" />
         <input type="submit" value="Submit" />
       </form>
     </div>

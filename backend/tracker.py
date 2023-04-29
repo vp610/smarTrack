@@ -4,6 +4,7 @@ import cv2
 from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import torch
+import os
 
 class Detector:
     def __init__(self, model_name) -> None:
@@ -28,14 +29,12 @@ class Detector:
 
         return detections
 
-
 def mainTracker(video_name):
     cap = cv2.VideoCapture(video_name)
     scale_factor = 0.4
 
     ret, frame = cap.read()
-
-    model = Detector("./runs/detect/yolov8n_boxes4/weights/best.pt")
+    model = Detector(os.path.join(os.path.abspath(os.path.dirname(__file__)),'runs','detect','yolov8n_boxes4','weights','best.pt'))
     tracker = DeepSort(max_age=5,
                     n_init=5,
                     nms_max_overlap=1.0,
@@ -51,10 +50,14 @@ def mainTracker(video_name):
                     polygon=False,
                     today=None)
 
+    boxes_dict = {}
     color = (0, 255, 0)
-
-    while ret:
+    count = 0
+    print(ret)
+    while count < 100 and ret:
+        h, w, _ = frame.shape
         frame = cv2.resize(frame, (0, 0), fx=scale_factor, fy=scale_factor)
+
         start = perf_counter()
         detections = model.get_detections(frame)
 
@@ -64,6 +67,8 @@ def mainTracker(video_name):
             if not track.is_confirmed():
                 continue
             track_id = track.track_id
+            boxes_dict[track_id] = boxes_dict.get(track_id, 0) + 1
+
             ltrb = track.to_ltrb()
 
             x1, y1, x2, y2 = ltrb
@@ -73,7 +78,8 @@ def mainTracker(video_name):
         end = perf_counter()
         total_time = end - start
         fps = 1 / total_time
-        cv2.putText(frame, "FPS: "+str(int(fps)), (20, 70), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 0), 2)
+        cv2.putText(frame, "FPS: "+str(int(fps)), (20, 70), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
+        cv2.putText(frame, "Counter: "+str(int(len(boxes_dict))), (20, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
         cv2.imshow("Video", frame)
 
         key = cv2.waitKey(30)
@@ -82,7 +88,8 @@ def mainTracker(video_name):
             break
 
         ret, frame = cap.read()
+        count+=1
 
     cap.release()
     cv2.destroyAllWindows()
-    return 0
+    return str(len(boxes_dict))

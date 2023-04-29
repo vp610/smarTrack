@@ -1,27 +1,28 @@
-from flask import Flask, send_from_directory, request, render_template
+from flask import Flask, render_template
 from flask_wtf import FlaskForm
 from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
+from werkzeug.utils import secure_filename
+import os
 
-app = Flask(__name__, static_url_path='', static_folder='smartrack/build')
+app = Flask(__name__)
+
+app.config['SECRET_KEY'] = 'hiddenkey'
+app.config['UPLOAD_FOLDER'] = 'files'
 
 class UploadFileForm(FlaskForm):
     file = FileField("File", validators=[InputRequired()])
     submit = SubmitField("Upload File")
 
-@app.route("/", defaults={'path':''})
-def serve(path):
-    return send_from_directory(app.static_folder,'index.html')
-
-@app.route("/", methods=["POST", "GET"])
-def handle_form():
+@app.route("/", methods=['GET',"POST"])
+def upload():
     form = UploadFileForm()
     if form.validate_on_submit():
         file = form.file.data
-        print(file.filename)
+        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
         return "File has been uploaded."
     return render_template('index.html', form=form)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
     

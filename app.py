@@ -4,6 +4,7 @@ from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 import os
+from backend.tracker import mainTracker
 
 app = Flask(__name__)
 
@@ -20,7 +21,8 @@ def upload():
     if form.validate_on_submit():
         file = form.file.data
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
-        return "File has been uploaded."
+        file_path = "files/" + file.filename
+        return mainTracker(file_path)
     return render_template('index.html', form=form)
 
 if __name__ == '__main__':

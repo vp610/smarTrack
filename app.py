@@ -22,7 +22,7 @@ def upload():
         file = form.file.data
         file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
         file_path = "files/" + file.filename
-        return mainTracker(file_path)
+        return "Number of packages: " + mainTracker(file_path)
     return render_template('index.html', form=form)
 
 if __name__ == '__main__':

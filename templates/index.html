@@ -6,7 +6,7 @@
     <meta name="description" content="" />
     <meta name="author" content="" />
     <title>SmarTrack</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
     <!-- Font icons -->
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
 
-    <link href="styles.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='stylesheets/styles.css') }}" rel="stylesheet" />
 </head>
   <body id="page-top">
 
@@ -30,14 +30,12 @@
                 <!-- <a class="btn btn-primary" href="#about">Get Started</a> -->
                 <form method='POST' enctype='multipart/form-data'>
                   <div class="input-group mb-3">
-                    <input type="file" class="form-control" id="inputGroupFile02">
-                    <label class="input-group-text" for="inputGroupFile02">Upload</label>
+                    <!-- <input type="file" name="video" class="form-control" id="inputGroupFile02">
+                    <input class="input-group-text" for="inputGroupFile02" type="submit" name="Submit">Upload</input> -->
+                    {{form.hidden_tag()}}
+                    {{form.file(class_='form-control')}}
+                    {{form.submit(class_='input-group-text')}}
                   </div>
-                  <!-- <input type="file" name="video" />
-                  <input class="btn btn-primary" type="submit" name="Submit" /> -->
-                  <!-- {{form.hidden_tag()}}
-                  {{form.file()}}
-                  {{form.submit()}} -->
               </form>
             </div>
         </div>

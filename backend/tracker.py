@@ -29,6 +29,8 @@ class Detector:
 
         return detections
 
+@jit(target_backend='cuda')
+
 def mainTracker(video_name):
     cap = cv2.VideoCapture(video_name)
     scale_factor = 0.4
@@ -54,7 +56,7 @@ def mainTracker(video_name):
     color = (0, 255, 0)
     count = 0
     print(ret)
-    while count < 100 and ret:
+    while ret:
         h, w, _ = frame.shape
         frame = cv2.resize(frame, (0, 0), fx=scale_factor, fy=scale_factor)
 

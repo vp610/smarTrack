@@ -20,8 +20,9 @@ def upload():
     form = UploadFileForm()
     if form.validate_on_submit():
         file = form.file.data
-        file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
-        file_path = "files/" + file.filename
+        file_path = os.path.join(os.path.abspath(os.path.dirname(__file__)),app.config['UPLOAD_FOLDER'],secure_filename(file.filename))
+        file.save(file_path)
+
         return "Number of packages: " + mainTracker(file_path)
     return render_template('index.html', form=form)
 

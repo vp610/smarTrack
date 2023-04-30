@@ -5,6 +5,7 @@ from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import torch
 import os
+import os
 
 class Detector:
     def __init__(self, model_name) -> None:
@@ -25,7 +26,7 @@ class Detector:
                 y1 = int(y1)
                 y2 = int(y2)
                 score = int(score)
-                detections.append([(x1, y1, abs(x2-x1), abs(y2-y1)), score, 'package'])
+                detections.append([(x1, y1, abs(x2-x1), abs(y2-y1)), score, class_id])
 
         return detections
 
@@ -35,7 +36,6 @@ def mainTracker(video_name):
     scale_factor = 0.4
 
     ret, frame = cap.read()
-
     model = Detector(os.path.join(os.path.abspath(os.path.dirname(__file__)),'runs','detect','yolov8n_boxes4','weights','best.pt'))
     tracker = DeepSort(max_age=5,
                     n_init=5,

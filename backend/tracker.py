@@ -5,14 +5,13 @@ from ultralytics import YOLO
 from deep_sort_realtime.deepsort_tracker import DeepSort
 import torch
 import os
-import os
 
 class Detector:
     def __init__(self, model_name) -> None:
         self.model = YOLO(model_name)
         self.model.info(False)
-        # self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        # print("Using Device: ", self.device)
+        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        print("Using Device: ", self.device)
 
     def get_detections(self, frame):
         result = self.model(frame)[0]
@@ -26,20 +25,18 @@ class Detector:
                 y1 = int(y1)
                 y2 = int(y2)
                 score = int(score)
-                detections.append([(x1, y1, abs(x2-x1), abs(y2-y1)), score, class_id])
+                detections.append([(x1, y1, abs(x2-x1), abs(y2-y1)), score, 'package'])
 
         return detections
 
 @jit(target_backend='cuda')
+
 def mainTracker(video_name):
-    print(video_name)
     cap = cv2.VideoCapture(video_name)
     scale_factor = 0.4
-    # video_out_path = os.path.join('.', 'out.mp4')
+
     ret, frame = cap.read()
-    # cap_out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*'MP4V'), cap.get(cv2.CAP_PROP_FPS),
-    #                       (frame.shape[1], frame.shape[0]))
-    model = Detector(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'models','boxes.pt'))
+    model = Detector(os.path.join(os.path.abspath(os.path.dirname(__file__)),'runs','detect','yolov8n_boxes4','weights','best.pt'))
     tracker = DeepSort(max_age=5,
                     n_init=5,
                     nms_max_overlap=1.0,
@@ -59,7 +56,7 @@ def mainTracker(video_name):
     color = (0, 255, 0)
     count = 0
     print(ret)
-    while count < 1500 and ret:
+    while ret:
         h, w, _ = frame.shape
         frame = cv2.resize(frame, (0, 0), fx=scale_factor, fy=scale_factor)
 
@@ -85,7 +82,6 @@ def mainTracker(video_name):
         fps = 1 / total_time
         cv2.putText(frame, "FPS: "+str(int(fps)), (20, 70), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
         cv2.putText(frame, "Counter: "+str(int(len(boxes_dict))), (20, 100), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 255), 2)
-        # cap_out.write(frame)
         cv2.imshow("Video", frame)
 
         key = cv2.waitKey(30)
@@ -94,12 +90,8 @@ def mainTracker(video_name):
             break
 
         ret, frame = cap.read()
-        count += 1
+        count+=1
 
     cap.release()
-    # cap_out.release()
     cv2.destroyAllWindows()
     return str(len(boxes_dict))
-
-
-mainTracker("C:/Users/aweso/Desktop/Side Projects/SmarTrack/smarTrack/files/demo_video.mp4")

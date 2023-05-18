@@ -27,4 +27,9 @@ def upload():
     return render_template('index.html', form=form)
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run(debug=True)
+=======
+    app.run()
+    
+>>>>>>> 04c72fdbd8bce429c65303dcee41d22237c16474

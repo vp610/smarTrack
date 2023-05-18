@@ -29,6 +29,20 @@ class Detector:
 
         return detections
 
+class VideoDetector:
+    def __init__(self, video_name) -> None:
+        self.video = cv2.VideoCapture(video_name)
+    
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        ret, frame = self.video.read()
+        scale_factor = 0.4
+        frame = cv2.resize(frame, (0, 0), fx=scale_factor, fy=scale_factor)
+        ret, jpeg = cv2.imencode('.jpg', frame)
+        return jpeg.tobytes()
+
 @jit(target_backend='cuda')
 
 def mainTracker(video_name):
